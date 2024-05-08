@@ -41,13 +41,12 @@ class Parser:
                               height="750px",
                               width="100%",
                               cdn_resources="in_line",
-                              select_menu=True,
                               )
 
     def parse(self, root_id: str) -> Network:
         print('Parsing ...')
         self._parse_block(root_id)
-        print('Prasing ... done')
+        print('Parsing... done')
         return self._graph
 
     def export_to_html(self, file_path: str):
@@ -103,6 +102,7 @@ class Parser:
 
         self._retrieve_page_or_database_title(id, parent_page_or_database_id)
         self._parse_page_properties(obj['properties'], id)
+        self._parse_block_children(id, id)
 
     def _parse_block_object(self, obj: dict, parent_page_or_database_id: str = "") -> None:
         '''API Ref: https://developers.notion.com/reference/block#block-type-object
@@ -180,8 +180,6 @@ class Parser:
 
         if obj['type'] == 'child_page':
             self._parse_page(obj['id'], None, parent_page_or_database_id)
-            if obj['has_children']:
-                self._parse_block_children(obj['id'], obj['id'])
             return
 
         # column_list -> column -> block
@@ -219,7 +217,7 @@ class Parser:
 
         for i in prop_obj.values():
             if i['type'] not in SUPPORTED_PAGE_PROPERTY_TYPES:
-                return
+                continue
 
             if i['type'] == 'relation':
                 self._retrieve_relation_page_title(
@@ -298,10 +296,10 @@ class Parser:
         if not contains_mention_or_relation_type(str(rich_text_list)):
             return
 
-        for i in rich_text_list:
-            if i['type'] == 'mention':
-                self._retrieve_mention_object_title(
-                    i['mention'], parent_page_or_database_id)
+        mentions = [rich_text['mention'] for rich_text in rich_text_list if rich_text['type'] == 'mention']
+        pages_mentions = [mention['page'] for mention in mentions if mention['type'] == 'page']
+        for page in pages_mentions:
+            self._parse_page(page['id'], None, parent_page_or_database_id)
 
     def _retrieve_relation_page_title(self, relation_list: list, parent_page_or_database_id: str):
         '''Example:
@@ -366,6 +364,7 @@ class Parser:
 
         if isinstance(block, dict):
             title = block[block['type']]['title']
+            print(title)
             self._graph.add_node(page_or_database_id, label=title)
 
         if not is_same_block_id(page_or_database_id, parent_page_or_database_id):

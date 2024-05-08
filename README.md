@@ -64,6 +64,25 @@ network.prep_notebook()
 network.show("graph.html")
 ```
 
+## 🐳 Docker
+
+Build the image with the following command replacing `Page ID` and `Integration Token` :
+```shell
+docker build \
+--build-arg PAGE_ID=<Page ID> \
+--build-arg INTEGRATION_TOKEN=<Integration Token> \
+-t notion-graph .
+```
+> 👉 Do not share this image, the page id and the token are readable inside it.
+
+Then run the docker :
+```shell
+docker run -d -p 3000:80 notion-graph
+```
+
+Then open [the created graph](http://localhost:3000) !
+> ⚠️ if the graph is empty, remember to "Add connections" for the wanted notion pages.
+
 ## Testing Environment
 
 The testing page is [Notion-graph-view-demo](https://sund.notion.site/Notion-graph-view-Demo-856391c93ae64bd1b7ebf699ca0cd861). You can duplicate the page to your Notion account and run the project to test if everything goes well.

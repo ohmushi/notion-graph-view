@@ -32,6 +32,10 @@ SUPPORTED_PAGE_PROPERTY_TYPES = [
     "relation", "rich_text", "title"
 ]
 
+# Cache to avoid circular discovery
+PAGE_ID_CACHE = set()
+BLOCK_ID_CACHE = set()
+DATABASE_ID_CACHE = set()
 
 class Parser:
     def __init__(self, notion_version: str, bearer_token: str) -> None:
@@ -57,6 +61,9 @@ class Parser:
             fp.write(html)
 
     def _parse_block(self, root_id: str, obj: Any = None) -> None:
+        if(root_id in BLOCK_ID_CACHE):
+            return
+        BLOCK_ID_CACHE.add(root_id)
         if obj is None:
             try:
                 obj = self._notion.blocks.retrieve(root_id)
@@ -87,6 +94,9 @@ class Parser:
         self._parse_database_pages(id)
 
     def _parse_page(self, id: str, obj: Any = None, parent_page_or_database_id: str = "") -> None:
+        if(id in PAGE_ID_CACHE):
+            return
+        PAGE_ID_CACHE.add(id)
         if obj is None:
             try:
                 obj = self._notion.pages.retrieve(id)
@@ -171,6 +181,11 @@ class Parser:
             }
         }
         '''
+
+        if(obj['id'] in BLOCK_ID_CACHE):
+            return
+        BLOCK_ID_CACHE.add(obj['id'])
+
         if obj['type'] not in SUPPORTED_BLOCK_TYPES or obj['archived']:
             return
 
@@ -227,6 +242,9 @@ class Parser:
                     i[i['type']], parent_page_or_database_id)
 
     def _parse_database_pages(self, database_id: str) -> None:
+        if(database_id in DATABASE_ID_CACHE):
+            return
+        DATABASE_ID_CACHE.add(database_id)
         has_more = True
         next_cursor = None
         while has_more:

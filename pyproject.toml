@@ -2,7 +2,7 @@
 
 [tool.pdm.scripts]
 graph = "python -m notion_graph"
-web = "python -m web"
+web = "waitress-serve --port=3000 --call web:create_app"
 
 [project]
 name = "notion-graph"
@@ -15,6 +15,7 @@ dependencies = [
     "notion-client>=2.0.0",
     "pyvis==0.3.1",
     "flask",
+    "gevent",
 ]
 requires-python = ">=3.9"
 readme = "README.md"

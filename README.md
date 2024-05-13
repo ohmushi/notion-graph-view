@@ -68,16 +68,13 @@ network.show("graph.html")
 
 Build the image with the following command replacing `Page ID` and `Integration Token` :
 ```shell
-docker build \
---build-arg PAGE_ID=<Page ID> \
---build-arg INTEGRATION_TOKEN=<Integration Token> \
--t notion-graph .
+docker build -t notion-graph .
 ```
 > 👉 Do not share this image, the page id and the token are readable inside it.
 
 Then run the docker :
 ```shell
-docker run -d -p 3000:80 notion-graph
+docker run -d -p 3000:3000 notion-graph
 ```
 
 Then open [the created graph](http://localhost:3000) !

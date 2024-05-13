@@ -35,8 +35,8 @@ def generate():
     if os.path.exists(cache_path):
         file_mod_time = datetime.datetime.fromtimestamp(os.path.getmtime(cache_path))
         delta_last_generated = datetime.datetime.now() - file_mod_time
-        print(f"last generated : {delta_last_generated}\nttl : {ttl_datetime}")
         ttl_datetime = datetime.timedelta(minutes=ttl)
+        print(f"last generated : {delta_last_generated}\nttl : {ttl_datetime}")
         if delta_last_generated < ttl_datetime:
             return send_file(cache_path)
 

@@ -1,7 +1,8 @@
 [tool.pdm]
 
 [tool.pdm.scripts]
-start = "python -m notion_graph"
+graph = "python -m notion_graph"
+web = "python -m web"
 
 [project]
 name = "notion-graph"
@@ -13,6 +14,7 @@ authors = [
 dependencies = [
     "notion-client>=2.0.0",
     "pyvis==0.3.1",
+    "flask",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
